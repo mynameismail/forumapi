@@ -1,7 +1,7 @@
 class AddComment {
   constructor(payload) {
     this._verifyPayload(payload);
-    
+
     const { content, threadId, owner } = payload;
 
     this.content = content;

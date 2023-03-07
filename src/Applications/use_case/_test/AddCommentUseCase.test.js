@@ -12,11 +12,13 @@ describe('AddCommentUseCase', () => {
       threadId: 'thread-123',
       owner: 'user-123',
     };
+
     const mockAddedComment = new AddedComment({
       id: 'comment-123',
       content: useCasePayload.content,
       owner: useCasePayload.owner,
     });
+
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
     mockThreadRepository.getThreadById = jest.fn()
@@ -27,8 +29,10 @@ describe('AddCommentUseCase', () => {
       commentRepository: mockCommentRepository,
       threadRepository: mockThreadRepository,
     });
+
     // Action
     const addedComment = await addCommentUseCase.execute(useCasePayload);
+
     // Assert
     expect(addedComment).toStrictEqual(new AddedComment({
       id: 'comment-123',
