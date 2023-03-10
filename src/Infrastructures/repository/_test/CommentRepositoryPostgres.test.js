@@ -1,6 +1,8 @@
 const AddComment = require('../../../Domains/comments/entities/AddComment');
 const AddedComment = require('../../../Domains/comments/entities/AddedComment');
 const CommentRepositoryPostgres = require('../CommentRepositoryPostgres');
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const UsersTableTestHelper = require('../../../../tests/UsersTableTestHelper');
@@ -8,6 +10,7 @@ const pool = require('../../database/postgres/pool');
 
 describe('CommentRepositoryPostgres', () => {
   afterEach(async () => {
+    await CommentsTableTestHelper.cleanTable();
     await ThreadsTableTestHelper.cleanTable();
     await UsersTableTestHelper.cleanTable();
   });
@@ -42,6 +45,80 @@ describe('CommentRepositoryPostgres', () => {
         content: 'test comment',
         owner: mockUserId,
       }));
+    });
+  });
+
+  describe('verifyCommentOwner function', () => {
+    it('should throw NotFoundError when comment not found', async () => {
+      // Arrange
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+      // Action and Assert
+      await expect(commentRepositoryPostgres.verifyCommentOwner('comment-123', 'user-123'))
+        .rejects.toThrowError(NotFoundError);
+    });
+
+    it('should throw AuthorizationError when user is not owner', async () => {
+      // Arrange
+      const mockUserId = 'user-123';
+      const mockThreadId = 'thread-123';
+      const mockCommentId = 'comment-123';
+      await UsersTableTestHelper.addUser({ id: mockUserId });
+      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
+      await CommentsTableTestHelper.addComment({
+        id: mockCommentId,
+        threadId: mockThreadId,
+        owner: mockUserId,
+      });
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action and Assert
+      await expect(commentRepositoryPostgres.verifyCommentOwner(mockCommentId, 'user-456'))
+        .rejects.toThrowError(AuthorizationError);
+    });
+
+    it('should not throw NotFoundError nor AuthorizationError when comment found and user is owner', async () => {
+      // Arrange
+      const mockUserId = 'user-123';
+      const mockThreadId = 'thread-123';
+      const mockCommentId = 'comment-123';
+      await UsersTableTestHelper.addUser({ id: mockUserId });
+      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
+      await CommentsTableTestHelper.addComment({
+        id: mockCommentId,
+        threadId: mockThreadId,
+        owner: mockUserId,
+      });
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action and Assert
+      await expect(commentRepositoryPostgres.verifyCommentOwner(mockCommentId, mockUserId))
+        .resolves.not.toThrowError(NotFoundError);
+      await expect(commentRepositoryPostgres.verifyCommentOwner(mockCommentId, mockUserId))
+        .resolves.not.toThrowError(AuthorizationError);
+    });
+  });
+
+  describe('deleteComment function', () => {
+    it('should soft-delete comment from database', async () => {
+      // Arrange
+      const mockUserId = 'user-123';
+      const mockThreadId = 'thread-123';
+      const mockCommentId = 'comment-123';
+      await UsersTableTestHelper.addUser({ id: mockUserId });
+      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
+      await CommentsTableTestHelper.addComment({
+        id: mockCommentId,
+        threadId: mockThreadId,
+        owner: mockUserId,
+      });
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action
+      await commentRepositoryPostgres.deleteComment(mockCommentId);
+
+      // Assert
+      const comments = await CommentsTableTestHelper.findCommentsById(mockCommentId);
+      expect(comments[0].is_delete).toEqual(true);
     });
   });
 });
