@@ -1,5 +1,6 @@
 const AddComment = require('../../../Domains/comments/entities/AddComment');
 const AddedComment = require('../../../Domains/comments/entities/AddedComment');
+const DetailComment = require('../../../Domains/comments/entities/DetailComment');
 const CommentRepositoryPostgres = require('../CommentRepositoryPostgres');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
@@ -119,6 +120,28 @@ describe('CommentRepositoryPostgres', () => {
       // Assert
       const comments = await CommentsTableTestHelper.findCommentsById(mockCommentId);
       expect(comments[0].is_delete).toEqual(true);
+    });
+  });
+
+  describe('getCommentsByThreadId function', () => {
+    it('should return comments by threadId', async () => {
+      // Arrange
+      const mockUserId = 'user-123';
+      const mockThreadId = 'thread-123';
+      await UsersTableTestHelper.addUser({ id: mockUserId });
+      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
+      await CommentsTableTestHelper.addComment({ id: 'comment-123', threadId: mockThreadId });
+      await CommentsTableTestHelper.addComment({ id: 'comment-456', threadId: mockThreadId });
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action
+      const comments = await commentRepositoryPostgres.getCommentsByThreadId(mockThreadId);
+
+      // Assert
+      expect(comments).toHaveLength(2);
+      comments.forEach((comment) => {
+        expect(comment).toBeInstanceOf(DetailComment);
+      });
     });
   });
 });
