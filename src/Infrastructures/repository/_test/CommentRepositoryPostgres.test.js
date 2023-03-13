@@ -130,8 +130,12 @@ describe('CommentRepositoryPostgres', () => {
       const mockThreadId = 'thread-123';
       await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
-      await CommentsTableTestHelper.addComment({ id: 'comment-123', threadId: mockThreadId });
-      await CommentsTableTestHelper.addComment({ id: 'comment-456', threadId: mockThreadId });
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-123', threadId: mockThreadId,
+      });
+      await CommentsTableTestHelper.addComment({
+        id: 'comment-456', threadId: mockThreadId, is_delete: true,
+      });
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
 
       // Action
@@ -141,6 +145,9 @@ describe('CommentRepositoryPostgres', () => {
       expect(comments).toHaveLength(2);
       comments.forEach((comment) => {
         expect(comment).toBeInstanceOf(DetailComment);
+        if (comment.id === 'comment-456') {
+          expect(comment.content).toEqual('**komentar telah dihapus**');
+        }
       });
     });
   });
