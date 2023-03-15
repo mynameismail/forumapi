@@ -151,4 +151,23 @@ describe('CommentRepositoryPostgres', () => {
       });
     });
   });
+
+  describe('checkIfCommentIdExist function', () => {
+    it('should throw NotFoundError when commentId not exist', async () => {
+      // Arrange
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+      // Action and Assert
+      await expect(commentRepositoryPostgres.checkIfCommentIdExist('comment-123')).rejects.toThrowError(NotFoundError);
+    });
+
+    it('should not throw NotFoundError when commentId exist', async () => {
+      // Arrange
+      await UsersTableTestHelper.addUser({ id: 'user-123' });
+      await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+      await CommentsTableTestHelper.addComment({ id: 'comment-123' });
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+      // Action and Assert
+      await expect(commentRepositoryPostgres.checkIfCommentIdExist('comment-123')).resolves.not.toThrowError(NotFoundError);
+    });
+  });
 });
