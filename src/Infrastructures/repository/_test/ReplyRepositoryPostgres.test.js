@@ -1,5 +1,6 @@
 const AddReply = require('../../../Domains/replies/entities/AddReply');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
+const DetailReply = require('../../../Domains/replies/entities/DetailReply');
 const ReplyRepositoryPostgres = require('../ReplyRepositoryPostgres');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
@@ -130,6 +131,44 @@ describe('ReplyRepositoryPostgres', () => {
       // Assert
       const replies = await RepliesTableTestHelper.findRepliesById(mockReplyId);
       expect(replies[0].is_delete).toEqual(true);
+    });
+  });
+
+  describe('getRepliesByCommentIds function', () => {
+    it('should return replies by commentIds', async () => {
+      // Arrange
+      const mockUserId = 'user-123';
+      const mockThreadId = 'thread-123';
+      const mockCommentIds = ['comment-123', 'comment-456'];
+      await UsersTableTestHelper.addUser({ id: mockUserId });
+      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
+      mockCommentIds.forEach(async (mockCommentId) => {
+        await CommentsTableTestHelper.addComment({
+          id: mockCommentId, threadId: mockThreadId,
+        });
+      });
+      await RepliesTableTestHelper.addReply({
+        id: 'reply-123', commentId: mockCommentIds[0],
+      });
+      await RepliesTableTestHelper.addReply({
+        id: 'reply-456', commentId: mockCommentIds[0], is_delete: true,
+      });
+      await RepliesTableTestHelper.addReply({
+        id: 'reply-789', commentId: mockCommentIds[1],
+      });
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action
+      const replies = await replyRepositoryPostgres.getRepliesByCommentIds(mockCommentIds);
+
+      // Assert
+      expect(replies).toHaveLength(3);
+      replies.forEach((reply) => {
+        expect(reply).toBeInstanceOf(DetailReply);
+        if (reply.id === 'reply-456') {
+          expect(reply.content).toEqual('**balasan telah dihapus**');
+        }
+      });
     });
   });
 });
