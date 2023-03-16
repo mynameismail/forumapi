@@ -1,6 +1,8 @@
 const AddReply = require('../../../Domains/replies/entities/AddReply');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
 const ReplyRepositoryPostgres = require('../ReplyRepositoryPostgres');
+const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
+const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const RepliesTableTestHelper = require('../../../../tests/RepliesTableTestHelper');
 const CommentsTableTestHelper = require('../../../../tests/CommentsTableTestHelper');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
@@ -48,6 +50,86 @@ describe('ReplyRepositoryPostgres', () => {
         content: 'test reply',
         owner: mockUserId,
       }));
+    });
+  });
+
+  describe('verifyReplyOwner function', () => {
+    it('should throw NotFoundError when reply not found', async () => {
+      // Arrange
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+      // Action and Assert
+      await expect(replyRepositoryPostgres.verifyReplyOwner('reply-123', 'user-123'))
+        .rejects.toThrowError(NotFoundError);
+    });
+
+    it('should throw AuthorizationError when user is not owner', async () => {
+      // Arrange
+      const mockUserId = 'user-123';
+      const mockThreadId = 'thread-123';
+      const mockCommentId = 'comment-123';
+      const mockReplyId = 'reply-123';
+      await UsersTableTestHelper.addUser({ id: mockUserId });
+      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
+      await CommentsTableTestHelper.addComment({ id: mockCommentId });
+      await RepliesTableTestHelper.addReply({
+        id: mockReplyId,
+        commentId: mockCommentId,
+        owner: mockUserId,
+      });
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action and Assert
+      await expect(replyRepositoryPostgres.verifyReplyOwner(mockReplyId, 'user-456'))
+        .rejects.toThrowError(AuthorizationError);
+    });
+
+    it('should not throw NotFoundError nor AuthorizationError when reply found and user is owner', async () => {
+      // Arrange
+      const mockUserId = 'user-123';
+      const mockThreadId = 'thread-123';
+      const mockCommentId = 'comment-123';
+      const mockReplyId = 'reply-123';
+      await UsersTableTestHelper.addUser({ id: mockUserId });
+      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
+      await CommentsTableTestHelper.addComment({ id: mockCommentId });
+      await RepliesTableTestHelper.addReply({
+        id: mockReplyId,
+        commentId: mockCommentId,
+        owner: mockUserId,
+      });
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action and Assert
+      await expect(replyRepositoryPostgres.verifyReplyOwner(mockReplyId, mockUserId))
+        .resolves.not.toThrowError(NotFoundError);
+      await expect(replyRepositoryPostgres.verifyReplyOwner(mockReplyId, mockUserId))
+        .resolves.not.toThrowError(AuthorizationError);
+    });
+  });
+
+  describe('deleteReply function', () => {
+    it('should soft-delete reply from database', async () => {
+      // Arrange
+      const mockUserId = 'user-123';
+      const mockThreadId = 'thread-123';
+      const mockCommentId = 'comment-123';
+      const mockReplyId = 'reply-123';
+      await UsersTableTestHelper.addUser({ id: mockUserId });
+      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
+      await CommentsTableTestHelper.addComment({ id: mockCommentId });
+      await RepliesTableTestHelper.addReply({
+        id: mockReplyId,
+        commentId: mockCommentId,
+        owner: mockUserId,
+      });
+      const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
+
+      // Action
+      await replyRepositoryPostgres.deleteReply(mockReplyId);
+
+      // Assert
+      const replies = await RepliesTableTestHelper.findRepliesById(mockReplyId);
+      expect(replies[0].is_delete).toEqual(true);
     });
   });
 });
