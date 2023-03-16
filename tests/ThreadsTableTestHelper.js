@@ -3,7 +3,10 @@ const pool = require('../src/Infrastructures/database/postgres/pool');
 
 const ThreadsTableTestHelper = {
   async addThread({
-    id = 'thread-123', title = 'test thread', body = 'test thread body', owner = 'user-123',
+    id = 'thread-123',
+    title = 'test thread',
+    body = 'test thread body',
+    owner = 'user-123',
   }) {
     const createdAt = 'now';
     const query = {

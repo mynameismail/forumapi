@@ -34,10 +34,7 @@ describe('an AddReply entities', () => {
     };
     // Action
     const {
-      content,
-      commentId,
-      threadId,
-      owner,
+      content, commentId, threadId, owner,
     } = new AddReply(payload);
     // Assert
     expect(content).toEqual(payload.content);

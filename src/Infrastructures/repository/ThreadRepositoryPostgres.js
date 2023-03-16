@@ -16,7 +16,7 @@ class ThreadRepositoryPostgres extends ThreadRepository {
     const createdAt = new Date().toISOString();
 
     const query = {
-      text: 'INSERT INTO threads VALUES($1, $2, $3, $4, $5) RETURNING id, title, owner',
+      text: 'INSERT INTO threads VALUES ($1, $2, $3, $4, $5) RETURNING id, title, owner',
       values: [id, title, body, createdAt, owner],
     };
 
@@ -40,7 +40,12 @@ class ThreadRepositoryPostgres extends ThreadRepository {
 
   async getDetailThreadById(id) {
     const query = {
-      text: `SELECT threads.id, threads.title, threads.body, threads.created_at AS date, users.username
+      text: `SELECT
+          threads.id,
+          threads.title,
+          threads.body,
+          threads.created_at AS date,
+          users.username
         FROM threads
         LEFT JOIN users ON threads.owner = users.id
         WHERE threads.id = $1`,

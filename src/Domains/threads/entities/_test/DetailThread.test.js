@@ -37,11 +37,7 @@ describe('a DetailThread entities', () => {
     };
     // Action
     const {
-      id,
-      title,
-      body,
-      date,
-      username,
+      id, title, body, date, username,
     } = new DetailThread(payload);
     // Assert
     expect(id).toEqual(payload.id);

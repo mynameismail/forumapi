@@ -34,10 +34,7 @@ describe('a DeleteReply entities', () => {
     };
     // Action
     const {
-      threadId,
-      commentId,
-      replyId,
-      owner,
+      threadId, commentId, replyId, owner,
     } = new DeleteReply(payload);
     // Assert
     expect(threadId).toEqual(payload.threadId);

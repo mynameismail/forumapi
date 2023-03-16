@@ -16,7 +16,9 @@ class ReplyRepositoryPostgres extends ReplyRepository {
     const createdAt = new Date().toISOString();
 
     const query = {
-      text: 'INSERT INTO replies (id, content, comment_id, created_at, owner) VALUES ($1, $2, $3, $4, $5) RETURNING id, content, owner',
+      text: `INSERT INTO replies (id, content, comment_id, created_at, owner)
+        VALUES ($1, $2, $3, $4, $5)
+        RETURNING id, content, owner`,
       values: [id, content, commentId, createdAt, owner],
     };
 
@@ -53,7 +55,13 @@ class ReplyRepositoryPostgres extends ReplyRepository {
 
   async getRepliesByCommentIds(commentIds) {
     const query = {
-      text: `SELECT replies.id, replies.created_at AS date, replies.content, replies.is_delete, replies.comment_id, users.username
+      text: `SELECT
+          replies.id,
+          replies.created_at AS date,
+          replies.content,
+          replies.is_delete,
+          replies.comment_id,
+          users.username
         FROM replies
         LEFT JOIN users ON replies.owner = users.id
         WHERE replies.comment_id = ANY($1)

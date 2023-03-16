@@ -11,10 +11,7 @@ class RepliesHandler {
     const { commentId, threadId } = request.params;
     const { id: owner } = request.auth.credentials;
     const useCasePayload = {
-      ...request.payload,
-      commentId,
-      threadId,
-      owner,
+      ...request.payload, commentId, threadId, owner,
     };
     const addedReply = await addReplyUseCase.execute(useCasePayload);
 
@@ -33,10 +30,7 @@ class RepliesHandler {
     const { threadId, commentId, replyId } = request.params;
     const { id: owner } = request.auth.credentials;
     const useCasePayload = {
-      threadId,
-      commentId,
-      replyId,
-      owner,
+      threadId, commentId, replyId, owner,
     };
     await deleteReplyUseCase.execute(useCasePayload);
 

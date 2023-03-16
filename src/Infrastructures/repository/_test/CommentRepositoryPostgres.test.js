@@ -131,10 +131,13 @@ describe('CommentRepositoryPostgres', () => {
       await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({
-        id: 'comment-123', threadId: mockThreadId,
+        id: 'comment-123',
+        threadId: mockThreadId,
       });
       await CommentsTableTestHelper.addComment({
-        id: 'comment-456', threadId: mockThreadId, is_delete: true,
+        id: 'comment-456',
+        threadId: mockThreadId,
+        is_delete: true,
       });
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
 
@@ -157,7 +160,8 @@ describe('CommentRepositoryPostgres', () => {
       // Arrange
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
       // Action and Assert
-      await expect(commentRepositoryPostgres.checkIfCommentIdExist('comment-123')).rejects.toThrowError(NotFoundError);
+      await expect(commentRepositoryPostgres.checkIfCommentIdExist('comment-123'))
+        .rejects.toThrowError(NotFoundError);
     });
 
     it('should not throw NotFoundError when commentId exist', async () => {
@@ -167,7 +171,8 @@ describe('CommentRepositoryPostgres', () => {
       await CommentsTableTestHelper.addComment({ id: 'comment-123' });
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
       // Action and Assert
-      await expect(commentRepositoryPostgres.checkIfCommentIdExist('comment-123')).resolves.not.toThrowError(NotFoundError);
+      await expect(commentRepositoryPostgres.checkIfCommentIdExist('comment-123'))
+        .resolves.not.toThrowError(NotFoundError);
     });
   });
 });

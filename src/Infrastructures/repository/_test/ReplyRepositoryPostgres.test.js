@@ -145,13 +145,17 @@ describe('ReplyRepositoryPostgres', () => {
         await CommentsTableTestHelper.addComment({ id: mockCommentId });
       });
       await RepliesTableTestHelper.addReply({
-        id: 'reply-123', commentId: mockCommentIds[0],
+        id: 'reply-123',
+        commentId: mockCommentIds[0],
       });
       await RepliesTableTestHelper.addReply({
-        id: 'reply-456', commentId: mockCommentIds[0], is_delete: true,
+        id: 'reply-456',
+        commentId: mockCommentIds[0],
+        is_delete: true,
       });
       await RepliesTableTestHelper.addReply({
-        id: 'reply-789', commentId: mockCommentIds[1],
+        id: 'reply-789',
+        commentId: mockCommentIds[1],
       });
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
 
