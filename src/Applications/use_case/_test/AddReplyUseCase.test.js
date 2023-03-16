@@ -3,6 +3,7 @@ const AddReply = require('../../../Domains/replies/entities/AddReply');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
 const ReplyRepository = require('../../../Domains/replies/ReplyRepository');
 const CommentRepository = require('../../../Domains/comments/CommentRepository');
+const ThreadRepository = require('../../../Domains/threads/ThreadRepository');
 
 describe('AddReplyUseCase', () => {
   it('should orchestrating the add comment action correctly', async () => {
@@ -10,6 +11,7 @@ describe('AddReplyUseCase', () => {
     const useCasePayload = {
       content: 'test reply',
       commentId: 'comment-123',
+      threadId: 'thread-123',
       owner: 'user-123',
     };
 
@@ -19,8 +21,11 @@ describe('AddReplyUseCase', () => {
       owner: useCasePayload.owner,
     });
 
+    const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
+    mockThreadRepository.checkIfThreadIdExist = jest.fn()
+      .mockImplementation(() => Promise.resolve());
     mockCommentRepository.checkIfCommentIdExist = jest.fn()
       .mockImplementation(() => Promise.resolve());
     mockReplyRepository.addReply = jest.fn()
@@ -28,6 +33,7 @@ describe('AddReplyUseCase', () => {
     const addReplyUseCase = new AddReplyUseCase({
       replyRepository: mockReplyRepository,
       commentRepository: mockCommentRepository,
+      threadRepository: mockThreadRepository,
     });
 
     // Action
@@ -39,6 +45,7 @@ describe('AddReplyUseCase', () => {
       content: useCasePayload.content,
       owner: useCasePayload.owner,
     }));
+    expect(mockThreadRepository.checkIfThreadIdExist).toBeCalledWith(useCasePayload.threadId);
     expect(mockCommentRepository.checkIfCommentIdExist).toBeCalledWith(useCasePayload.commentId);
     expect(mockReplyRepository.addReply).toBeCalledWith(new AddReply(useCasePayload));
   });

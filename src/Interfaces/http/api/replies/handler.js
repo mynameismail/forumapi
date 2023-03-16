@@ -7,9 +7,14 @@ class RepliesHandler {
 
   async postReplyHandler(request, h) {
     const addReplyUseCase = this._container.getInstance(AddReplyUseCase.name);
-    const { commentId } = request.params;
+    const { commentId, threadId } = request.params;
     const { id: owner } = request.auth.credentials;
-    const useCasePayload = { ...request.payload, commentId, owner };
+    const useCasePayload = {
+      ...request.payload,
+      commentId,
+      threadId,
+      owner,
+    };
     const addedReply = await addReplyUseCase.execute(useCasePayload);
 
     const response = h.response({

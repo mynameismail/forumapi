@@ -24,12 +24,14 @@ describe('ReplyRepositoryPostgres', () => {
       // Arrange
       const mockUserId = 'user-123';
       const mockCommentId = 'comment-123';
+      const mockThreadId = 'thread-123';
       await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
+      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({ id: mockCommentId });
       const reply = new AddReply({
         content: 'test reply',
         commentId: mockCommentId,
+        threadId: mockThreadId,
         owner: mockUserId,
       });
       const fakeIdGenerator = () => '123';

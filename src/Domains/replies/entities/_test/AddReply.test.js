@@ -6,6 +6,7 @@ describe('an AddReply entities', () => {
     const payload = {
       content: 'abc',
       commentId: 'abc',
+      threadId: 'abc',
     };
     // Action and Assert
     expect(() => new AddReply(payload)).toThrowError('ADD_REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
@@ -16,6 +17,7 @@ describe('an AddReply entities', () => {
     const payload = {
       content: 123,
       commentId: true,
+      threadId: [],
       owner: 'abc',
     };
     // Action and Assert
@@ -27,13 +29,20 @@ describe('an AddReply entities', () => {
     const payload = {
       content: 'abc',
       commentId: 'abc',
+      threadId: 'abc',
       owner: 'abc',
     };
     // Action
-    const { content, commentId, owner } = new AddReply(payload);
+    const {
+      content,
+      commentId,
+      threadId,
+      owner,
+    } = new AddReply(payload);
     // Assert
     expect(content).toEqual(payload.content);
     expect(commentId).toEqual(payload.commentId);
+    expect(threadId).toEqual(payload.threadId);
     expect(owner).toEqual(payload.owner);
   });
 });

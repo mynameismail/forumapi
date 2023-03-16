@@ -118,6 +118,37 @@ describe('replies endpoint', () => {
       expect(responseJson.message).toEqual('tidak dapat membuat reply baru karena tipe data tidak sesuai');
     });
 
+    it('should response 404 when threadId not exist', async () => {
+      // Arrange
+      const mockUserId = 'user-123';
+      const mockThreadId = 'thread-123';
+      const mockCommentId = 'comment-123';
+      await UsersTableTestHelper.addUser({ id: mockUserId });
+
+      const requestPayload = {
+        content: 'test reply',
+      };
+      const server = await createServer(container);
+
+      // Action
+      const jwtTokenManager = new JwtTokenManager(Jwt.token);
+      const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
+      const response = await server.inject({
+        method: 'POST',
+        url: `/threads/${mockThreadId}/comments/${mockCommentId}/replies`,
+        payload: requestPayload,
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      // Assert
+      const responseJson = JSON.parse(response.payload);
+      expect(response.statusCode).toEqual(404);
+      expect(responseJson.status).toEqual('fail');
+      expect(responseJson.message).toEqual('thread tidak ditemukan');
+    });
+
     it('should response 404 when commentId not exist', async () => {
       // Arrange
       const mockUserId = 'user-123';
