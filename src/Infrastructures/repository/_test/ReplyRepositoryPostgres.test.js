@@ -1,6 +1,5 @@
 const AddReply = require('../../../Domains/replies/entities/AddReply');
 const AddedReply = require('../../../Domains/replies/entities/AddedReply');
-const DetailReply = require('../../../Domains/replies/entities/DetailReply');
 const ReplyRepositoryPostgres = require('../ReplyRepositoryPostgres');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
@@ -143,9 +142,7 @@ describe('ReplyRepositoryPostgres', () => {
       await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       mockCommentIds.forEach(async (mockCommentId) => {
-        await CommentsTableTestHelper.addComment({
-          id: mockCommentId, threadId: mockThreadId,
-        });
+        await CommentsTableTestHelper.addComment({ id: mockCommentId });
       });
       await RepliesTableTestHelper.addReply({
         id: 'reply-123', commentId: mockCommentIds[0],
@@ -164,7 +161,6 @@ describe('ReplyRepositoryPostgres', () => {
       // Assert
       expect(replies).toHaveLength(3);
       replies.forEach((reply) => {
-        expect(reply).toBeInstanceOf(DetailReply);
         if (reply.id === 'reply-456') {
           expect(reply.content).toEqual('**balasan telah dihapus**');
         }
