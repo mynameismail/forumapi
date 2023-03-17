@@ -1,6 +1,5 @@
 const AddComment = require('../../../Domains/comments/entities/AddComment');
 const AddedComment = require('../../../Domains/comments/entities/AddedComment');
-const DetailComment = require('../../../Domains/comments/entities/DetailComment');
 const CommentRepositoryPostgres = require('../CommentRepositoryPostgres');
 const AuthorizationError = require('../../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
@@ -146,12 +145,17 @@ describe('CommentRepositoryPostgres', () => {
 
       // Assert
       expect(comments).toHaveLength(2);
-      comments.forEach((comment) => {
-        expect(comment).toBeInstanceOf(DetailComment);
-        if (comment.id === 'comment-456') {
-          expect(comment.content).toEqual('**komentar telah dihapus**');
-        }
-      });
+      const [comment1, comment2] = comments;
+      expect(comment1.id).toEqual('comment-123');
+      expect(comment1.date).toBeDefined();
+      expect(comment1.content).toBeDefined();
+      expect(comment1.username).toBeDefined();
+      expect(comment1.is_delete).toEqual(false);
+      expect(comment2.id).toEqual('comment-456');
+      expect(comment2.date).toBeDefined();
+      expect(comment2.content).toBeDefined();
+      expect(comment2.username).toBeDefined();
+      expect(comment2.is_delete).toEqual(true);
     });
   });
 

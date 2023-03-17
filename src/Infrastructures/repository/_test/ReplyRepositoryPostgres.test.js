@@ -141,9 +141,8 @@ describe('ReplyRepositoryPostgres', () => {
       const mockCommentIds = ['comment-123', 'comment-456'];
       await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
-      mockCommentIds.forEach(async (mockCommentId) => {
-        await CommentsTableTestHelper.addComment({ id: mockCommentId });
-      });
+      await CommentsTableTestHelper.addComment({ id: mockCommentIds[0] });
+      await CommentsTableTestHelper.addComment({ id: mockCommentIds[1] });
       await RepliesTableTestHelper.addReply({
         id: 'reply-123',
         commentId: mockCommentIds[0],
@@ -164,11 +163,25 @@ describe('ReplyRepositoryPostgres', () => {
 
       // Assert
       expect(replies).toHaveLength(3);
-      replies.forEach((reply) => {
-        if (reply.id === 'reply-456') {
-          expect(reply.content).toEqual('**balasan telah dihapus**');
-        }
-      });
+      const [reply1, reply2, reply3] = replies;
+      expect(reply1.id).toEqual('reply-123');
+      expect(reply1.date).toBeDefined();
+      expect(reply1.content).toBeDefined();
+      expect(reply1.comment_id).toEqual('comment-123');
+      expect(reply1.username).toBeDefined();
+      expect(reply1.is_delete).toEqual(false);
+      expect(reply2.id).toEqual('reply-456');
+      expect(reply2.date).toBeDefined();
+      expect(reply2.content).toBeDefined();
+      expect(reply2.comment_id).toEqual('comment-123');
+      expect(reply2.username).toBeDefined();
+      expect(reply2.is_delete).toEqual(true);
+      expect(reply3.id).toEqual('reply-789');
+      expect(reply3.date).toBeDefined();
+      expect(reply3.content).toBeDefined();
+      expect(reply3.comment_id).toEqual('comment-456');
+      expect(reply3.username).toBeDefined();
+      expect(reply3.is_delete).toEqual(false);
     });
   });
 });

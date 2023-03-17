@@ -8,7 +8,7 @@ const ThreadsTableTestHelper = {
     body = 'test thread body',
     owner = 'user-123',
   }) {
-    const createdAt = 'now';
+    const createdAt = new Date().toISOString();
     const query = {
       text: 'INSERT INTO threads VALUES ($1, $2, $3, $4, $5)',
       values: [id, title, body, createdAt, owner],

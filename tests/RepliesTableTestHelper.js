@@ -9,7 +9,7 @@ const RepliesTableTestHelper = {
     owner = 'user-123',
     is_delete = false,
   }) {
-    const createdAt = 'now';
+    const createdAt = new Date().toISOString();
     const query = {
       text: 'INSERT INTO replies VALUES ($1, $2, $3, $4, $5, $6)',
       values: [id, content, commentId, createdAt, owner, is_delete],

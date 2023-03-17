@@ -1,5 +1,4 @@
 const AddedComment = require('../../Domains/comments/entities/AddedComment');
-const DetailComment = require('../../Domains/comments/entities/DetailComment');
 const CommentRepository = require('../../Domains/comments/CommentRepository');
 const AuthorizationError = require('../../Commons/exceptions/AuthorizationError');
 const NotFoundError = require('../../Commons/exceptions/NotFoundError');
@@ -71,16 +70,7 @@ class CommentRepositoryPostgres extends CommentRepository {
 
     const result = await this._pool.query(query);
 
-    const comments = result.rows.map((comment) => {
-      if (comment.is_delete) {
-        return new DetailComment({
-          ...comment,
-          content: '**komentar telah dihapus**',
-        });
-      }
-      return new DetailComment(comment);
-    });
-    return comments;
+    return result.rows;
   }
 
   async checkIfCommentIdExist(id) {

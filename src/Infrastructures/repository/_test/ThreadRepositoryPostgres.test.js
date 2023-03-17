@@ -1,6 +1,5 @@
 const AddThread = require('../../../Domains/threads/entities/AddThread');
 const AddedThread = require('../../../Domains/threads/entities/AddedThread');
-const DetailThread = require('../../../Domains/threads/entities/DetailThread');
 const NotFoundError = require('../../../Commons/exceptions/NotFoundError');
 const ThreadsTableTestHelper = require('../../../../tests/ThreadsTableTestHelper');
 const ThreadRepositoryPostgres = require('../ThreadRepositoryPostgres');
@@ -74,7 +73,7 @@ describe('ThreadRepositoryPostgres', () => {
         .rejects.toThrowError(NotFoundError);
     });
 
-    it('should return a DetailThread correctly', async () => {
+    it('should return a detailThread correctly', async () => {
       // Arrange
       const mockUserId = 'user-123';
       const mockUsername = 'developer';
@@ -87,9 +86,18 @@ describe('ThreadRepositoryPostgres', () => {
       const detailThread = await threadRepositoryPostgres.getDetailThreadById(mockThreadId);
 
       // Assert
-      expect(detailThread).toBeInstanceOf(DetailThread);
-      expect(detailThread.id).toEqual(mockThreadId);
-      expect(detailThread.username).toEqual(mockUsername);
+      const {
+        id,
+        title,
+        body,
+        date,
+        username,
+      } = detailThread;
+      expect(id).toEqual(mockThreadId);
+      expect(title).toBeDefined();
+      expect(body).toBeDefined();
+      expect(date).toBeDefined();
+      expect(username).toEqual(mockUsername);
     });
   });
 });
