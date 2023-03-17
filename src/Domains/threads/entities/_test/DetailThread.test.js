@@ -8,6 +8,7 @@ describe('a DetailThread entities', () => {
       title: 'abc',
       body: 'abc',
       date: 'abc',
+      username: 'abc',
     };
     // Action and Assert
     expect(() => new DetailThread(payload)).toThrowError('DETAIL_THREAD.NOT_CONTAIN_NEEDED_PROPERTY');
@@ -21,6 +22,7 @@ describe('a DetailThread entities', () => {
       body: [],
       date: 123,
       username: true,
+      comments: 'abc',
     };
     // Action and Assert
     expect(() => new DetailThread(payload)).toThrowError('DETAIL_THREAD.NOT_MEET_DATA_TYPE_SPECIFICATION');
@@ -34,10 +36,16 @@ describe('a DetailThread entities', () => {
       body: 'abc',
       date: 'abc',
       username: 'abc',
+      comments: [],
     };
     // Action
     const {
-      id, title, body, date, username,
+      id,
+      title,
+      body,
+      date,
+      username,
+      comments,
     } = new DetailThread(payload);
     // Assert
     expect(id).toEqual(payload.id);
@@ -45,5 +53,6 @@ describe('a DetailThread entities', () => {
     expect(body).toEqual(payload.body);
     expect(date).toEqual(payload.date);
     expect(username).toEqual(payload.username);
+    expect(comments).toEqual(payload.comments);
   });
 });

@@ -7,6 +7,8 @@ describe('a DetailComment entities', () => {
       id: 'abc',
       username: 'abc',
       date: 'abc',
+      content: 'abc',
+      is_delete: 'abc',
     };
     // Action and Assert
     expect(() => new DetailComment(payload)).toThrowError('DETAIL_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
@@ -19,6 +21,8 @@ describe('a DetailComment entities', () => {
       username: true,
       date: 'abc',
       content: [],
+      is_delete: 'abc',
+      replies: 123,
     };
     // Action and Assert
     expect(() => new DetailComment(payload)).toThrowError('DETAIL_COMMENT.NOT_MEET_DATA_TYPE_SPECIFICATION');
@@ -31,15 +35,48 @@ describe('a DetailComment entities', () => {
       username: 'abc',
       date: 'abc',
       content: 'abc',
+      is_delete: false,
+      replies: [],
     };
     // Action
     const {
-      id, username, date, content,
+      id,
+      username,
+      date,
+      content,
+      replies,
     } = new DetailComment(payload);
     // Assert
     expect(id).toEqual(payload.id);
     expect(username).toEqual(payload.username);
     expect(date).toEqual(payload.date);
     expect(content).toEqual(payload.content);
+    expect(replies).toEqual(payload.replies);
+  });
+
+  it('should create deleted detailComment object correctly', () => {
+    // Arrange
+    const payload = {
+      id: 'abc',
+      username: 'abc',
+      date: 'abc',
+      content: 'abc',
+      is_delete: true,
+      replies: [],
+    };
+    // Action
+    const {
+      id,
+      username,
+      date,
+      content,
+      replies,
+    } = new DetailComment(payload);
+    // Assert
+    expect(id).toEqual(payload.id);
+    expect(username).toEqual(payload.username);
+    expect(date).toEqual(payload.date);
+    expect(content).toEqual('**komentar telah dihapus**');
+    expect(replies).toEqual(payload.replies);
   });
 });
