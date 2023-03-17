@@ -16,7 +16,10 @@ class AddReply {
   }
 
   _verifyPayload({
-    content, commentId, threadId, owner,
+    content,
+    commentId,
+    threadId,
+    owner,
   }) {
     if (!content || !commentId || !threadId || !owner) {
       throw new Error('ADD_REPLY.NOT_CONTAIN_NEEDED_PROPERTY');

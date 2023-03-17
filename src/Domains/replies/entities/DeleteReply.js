@@ -16,7 +16,10 @@ class DeleteReply {
   }
 
   _verifyPayload({
-    threadId, commentId, replyId, owner,
+    threadId,
+    commentId,
+    replyId,
+    owner,
   }) {
     if (!threadId || !commentId || !replyId || !owner) {
       throw new Error('DELETE_REPLY.NOT_CONTAIN_NEEDED_PROPERTY');
