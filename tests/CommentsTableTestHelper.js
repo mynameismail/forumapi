@@ -9,7 +9,7 @@ const CommentsTableTestHelper = {
     owner = 'user-123',
     is_delete = false,
   }) {
-    const createdAt = new Date().toISOString();
+    const createdAt = 'now';
     const query = {
       text: 'INSERT INTO comments VALUES ($1, $2, $3, $4, $5, $6)',
       values: [id, content, threadId, createdAt, owner, is_delete],

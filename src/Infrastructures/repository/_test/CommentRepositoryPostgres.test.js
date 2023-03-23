@@ -144,18 +144,22 @@ describe('CommentRepositoryPostgres', () => {
       const comments = await commentRepositoryPostgres.getCommentsByThreadId(mockThreadId);
 
       // Assert
-      expect(comments).toHaveLength(2);
-      const [comment1, comment2] = comments;
-      expect(comment1.id).toEqual('comment-123');
-      expect(comment1.date).toBeDefined();
-      expect(comment1.content).toBeDefined();
-      expect(comment1.username).toBeDefined();
-      expect(comment1.is_delete).toEqual(false);
-      expect(comment2.id).toEqual('comment-456');
-      expect(comment2.date).toBeDefined();
-      expect(comment2.content).toBeDefined();
-      expect(comment2.username).toBeDefined();
-      expect(comment2.is_delete).toEqual(true);
+      expect(comments).toStrictEqual([
+        {
+          id: 'comment-123',
+          date: 'now',
+          content: 'test comment',
+          username: 'dicoding',
+          is_delete: false,
+        },
+        {
+          id: 'comment-456',
+          date: 'now',
+          content: 'test comment',
+          username: 'dicoding',
+          is_delete: true,
+        },
+      ]);
     });
   });
 

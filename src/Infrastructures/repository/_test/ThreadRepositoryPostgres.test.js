@@ -86,18 +86,13 @@ describe('ThreadRepositoryPostgres', () => {
       const detailThread = await threadRepositoryPostgres.getDetailThreadById(mockThreadId);
 
       // Assert
-      const {
-        id,
-        title,
-        body,
-        date,
-        username,
-      } = detailThread;
-      expect(id).toEqual(mockThreadId);
-      expect(title).toBeDefined();
-      expect(body).toBeDefined();
-      expect(date).toBeDefined();
-      expect(username).toEqual(mockUsername);
+      expect(detailThread).toStrictEqual({
+        id: 'thread-123',
+        title: 'test thread',
+        body: 'test thread body',
+        date: 'now',
+        username: 'developer',
+      });
     });
   });
 });

@@ -30,10 +30,35 @@ describe('GetDetailThreadUseCase', () => {
         username: 'developer',
         date: 'now',
         content: 'test comment',
+        is_delete: true,
+      },
+    ];
+    const mockReplies = [
+      {
+        id: 'reply-123',
+        username: 'developer',
+        date: 'now',
+        content: 'test reply',
+        comment_id: 'comment-123',
+        is_delete: false,
+      },
+      {
+        id: 'reply-456',
+        username: 'developer',
+        date: 'now',
+        content: 'test reply',
+        comment_id: 'comment-123',
+        is_delete: true,
+      },
+      {
+        id: 'reply-789',
+        username: 'developer',
+        date: 'now',
+        content: 'test reply',
+        comment_id: 'comment-456',
         is_delete: false,
       },
     ];
-    const mockReplies = [];
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
@@ -53,81 +78,60 @@ describe('GetDetailThreadUseCase', () => {
     const detailThread = await getDetailThreadUseCase.execute(mockThreadId);
 
     // Assert
-    const { id, comments } = detailThread;
-    expect(detailThread).toBeInstanceOf(DetailThread);
-    expect(id).toEqual(mockThreadId);
-    expect(comments).toHaveLength(2);
-    comments.forEach((comment) => {
-      expect(comment).toBeInstanceOf(DetailComment);
-    });
-    expect(mockThreadRepository.getDetailThreadById).toBeCalledWith(mockThreadId);
-    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(mockThreadId);
-    expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith(['comment-123', 'comment-456']);
-  });
-
-  describe('_associateRepliesToComments function', () => {
-    it('should return comments with its replies each', () => {
-      // Arrange
-      const mockComments = [
-        {
+    expect(detailThread).toStrictEqual(new DetailThread({
+      id: 'thread-123',
+      title: 'test thread',
+      body: 'test thread body',
+      date: 'now',
+      username: 'developer',
+      comments: [
+        new DetailComment({
           id: 'comment-123',
           username: 'developer',
           date: 'now',
           content: 'test comment',
           is_delete: false,
-        },
-        {
+          replies: [
+            new DetailReply({
+              id: 'reply-123',
+              username: 'developer',
+              date: 'now',
+              content: 'test reply',
+              comment_id: 'comment-123',
+              is_delete: false,
+            }),
+            new DetailReply({
+              id: 'reply-456',
+              username: 'developer',
+              date: 'now',
+              content: '**balasan telah dihapus**',
+              comment_id: 'comment-123',
+              is_delete: true,
+            }),
+          ],
+        }),
+        new DetailComment({
           id: 'comment-456',
           username: 'developer',
           date: 'now',
-          content: 'test comment',
+          content: '**komentar telah dihapus**',
           is_delete: true,
-        },
-      ];
-      const mockReplies = [
-        {
-          id: 'reply-123',
-          username: 'developer',
-          date: 'now',
-          content: 'test reply',
-          comment_id: 'comment-123',
-          is_delete: false,
-        },
-        {
-          id: 'reply-456',
-          username: 'developer',
-          date: 'now',
-          content: 'test reply',
-          comment_id: 'comment-123',
-          is_delete: true,
-        },
-        {
-          id: 'reply-789',
-          username: 'developer',
-          date: 'now',
-          content: 'test reply',
-          comment_id: 'comment-456',
-          is_delete: false,
-        },
-      ];
-      const getDetailThreadUseCase = new GetDetailThreadUseCase({
-        threadRepository: {},
-        commentRepository: {},
-        replyRepository: {},
-      });
+          replies: [
+            new DetailReply({
+              id: 'reply-789',
+              username: 'developer',
+              date: 'now',
+              content: 'test reply',
+              comment_id: 'comment-456',
+              is_delete: false,
+            }),
+          ],
+        }),
+      ],
+    }));
 
-      // Action
-      const commentsWithReplies = getDetailThreadUseCase
-        ._associateRepliesToComments(mockComments, mockReplies);
-
-      // Assert
-      commentsWithReplies.forEach((comment) => {
-        expect(comment).toBeInstanceOf(DetailComment);
-        expect(comment.replies.length).toBeGreaterThan(0);
-        comment.replies.forEach((reply) => {
-          expect(reply).toBeInstanceOf(DetailReply);
-        });
-      });
-    });
+    expect(mockThreadRepository.getDetailThreadById).toBeCalledWith(mockThreadId);
+    expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(mockThreadId);
+    expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith(['comment-123', 'comment-456']);
   });
 });

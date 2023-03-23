@@ -162,26 +162,32 @@ describe('ReplyRepositoryPostgres', () => {
       const replies = await replyRepositoryPostgres.getRepliesByCommentIds(mockCommentIds);
 
       // Assert
-      expect(replies).toHaveLength(3);
-      const [reply1, reply2, reply3] = replies;
-      expect(reply1.id).toEqual('reply-123');
-      expect(reply1.date).toBeDefined();
-      expect(reply1.content).toBeDefined();
-      expect(reply1.comment_id).toEqual('comment-123');
-      expect(reply1.username).toBeDefined();
-      expect(reply1.is_delete).toEqual(false);
-      expect(reply2.id).toEqual('reply-456');
-      expect(reply2.date).toBeDefined();
-      expect(reply2.content).toBeDefined();
-      expect(reply2.comment_id).toEqual('comment-123');
-      expect(reply2.username).toBeDefined();
-      expect(reply2.is_delete).toEqual(true);
-      expect(reply3.id).toEqual('reply-789');
-      expect(reply3.date).toBeDefined();
-      expect(reply3.content).toBeDefined();
-      expect(reply3.comment_id).toEqual('comment-456');
-      expect(reply3.username).toBeDefined();
-      expect(reply3.is_delete).toEqual(false);
+      expect(replies).toStrictEqual([
+        {
+          id: 'reply-123',
+          date: 'now',
+          content: 'test reply',
+          username: 'dicoding',
+          is_delete: false,
+          comment_id: 'comment-123',
+        },
+        {
+          id: 'reply-456',
+          date: 'now',
+          content: 'test reply',
+          username: 'dicoding',
+          is_delete: true,
+          comment_id: 'comment-123',
+        },
+        {
+          id: 'reply-789',
+          date: 'now',
+          content: 'test reply',
+          username: 'dicoding',
+          is_delete: false,
+          comment_id: 'comment-456',
+        },
+      ]);
     });
   });
 });
