@@ -21,23 +21,30 @@ describe('GetDetailThreadUseCase', () => {
       {
         id: 'comment-123',
         username: 'developer',
-        date: 'now',
+        date: 'now1',
         content: 'test comment',
         is_delete: false,
       },
       {
         id: 'comment-456',
         username: 'developer',
-        date: 'now',
+        date: 'now2',
         content: 'test comment',
         is_delete: true,
+      },
+      {
+        id: 'comment-789',
+        username: 'developer',
+        date: 'now3',
+        content: 'test comment',
+        is_delete: false,
       },
     ];
     const mockReplies = [
       {
         id: 'reply-123',
         username: 'developer',
-        date: 'now',
+        date: 'now1',
         content: 'test reply',
         comment_id: 'comment-123',
         is_delete: false,
@@ -45,7 +52,7 @@ describe('GetDetailThreadUseCase', () => {
       {
         id: 'reply-456',
         username: 'developer',
-        date: 'now',
+        date: 'now2',
         content: 'test reply',
         comment_id: 'comment-123',
         is_delete: true,
@@ -53,7 +60,7 @@ describe('GetDetailThreadUseCase', () => {
       {
         id: 'reply-789',
         username: 'developer',
-        date: 'now',
+        date: 'now3',
         content: 'test reply',
         comment_id: 'comment-456',
         is_delete: false,
@@ -88,14 +95,14 @@ describe('GetDetailThreadUseCase', () => {
         new DetailComment({
           id: 'comment-123',
           username: 'developer',
-          date: 'now',
+          date: 'now1',
           content: 'test comment',
           is_delete: false,
           replies: [
             new DetailReply({
               id: 'reply-123',
               username: 'developer',
-              date: 'now',
+              date: 'now1',
               content: 'test reply',
               comment_id: 'comment-123',
               is_delete: false,
@@ -103,7 +110,7 @@ describe('GetDetailThreadUseCase', () => {
             new DetailReply({
               id: 'reply-456',
               username: 'developer',
-              date: 'now',
+              date: 'now2',
               content: '**balasan telah dihapus**',
               comment_id: 'comment-123',
               is_delete: true,
@@ -113,25 +120,34 @@ describe('GetDetailThreadUseCase', () => {
         new DetailComment({
           id: 'comment-456',
           username: 'developer',
-          date: 'now',
+          date: 'now2',
           content: '**komentar telah dihapus**',
           is_delete: true,
           replies: [
             new DetailReply({
               id: 'reply-789',
               username: 'developer',
-              date: 'now',
+              date: 'now3',
               content: 'test reply',
               comment_id: 'comment-456',
               is_delete: false,
             }),
           ],
         }),
+        new DetailComment({
+          id: 'comment-789',
+          username: 'developer',
+          date: 'now3',
+          content: 'test comment',
+          is_delete: false,
+          replies: [],
+        }),
       ],
     }));
 
     expect(mockThreadRepository.getDetailThreadById).toBeCalledWith(mockThreadId);
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(mockThreadId);
-    expect(mockReplyRepository.getRepliesByCommentIds).toBeCalledWith(['comment-123', 'comment-456']);
+    expect(mockReplyRepository.getRepliesByCommentIds)
+      .toBeCalledWith(['comment-123', 'comment-456', 'comment-789']);
   });
 });

@@ -145,15 +145,18 @@ describe('ReplyRepositoryPostgres', () => {
       await CommentsTableTestHelper.addComment({ id: mockCommentIds[1] });
       await RepliesTableTestHelper.addReply({
         id: 'reply-123',
+        date: 'now1',
         commentId: mockCommentIds[0],
       });
       await RepliesTableTestHelper.addReply({
         id: 'reply-456',
+        date: 'now2',
         commentId: mockCommentIds[0],
         is_delete: true,
       });
       await RepliesTableTestHelper.addReply({
         id: 'reply-789',
+        date: 'now3',
         commentId: mockCommentIds[1],
       });
       const replyRepositoryPostgres = new ReplyRepositoryPostgres(pool, {});
@@ -165,7 +168,7 @@ describe('ReplyRepositoryPostgres', () => {
       expect(replies).toStrictEqual([
         {
           id: 'reply-123',
-          date: 'now',
+          date: 'now1',
           content: 'test reply',
           username: 'dicoding',
           is_delete: false,
@@ -173,7 +176,7 @@ describe('ReplyRepositoryPostgres', () => {
         },
         {
           id: 'reply-456',
-          date: 'now',
+          date: 'now2',
           content: 'test reply',
           username: 'dicoding',
           is_delete: true,
@@ -181,7 +184,7 @@ describe('ReplyRepositoryPostgres', () => {
         },
         {
           id: 'reply-789',
-          date: 'now',
+          date: 'now3',
           content: 'test reply',
           username: 'dicoding',
           is_delete: false,

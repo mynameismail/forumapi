@@ -131,10 +131,12 @@ describe('CommentRepositoryPostgres', () => {
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({
         id: 'comment-123',
+        date: 'now1',
         threadId: mockThreadId,
       });
       await CommentsTableTestHelper.addComment({
         id: 'comment-456',
+        date: 'now2',
         threadId: mockThreadId,
         is_delete: true,
       });
@@ -147,14 +149,14 @@ describe('CommentRepositoryPostgres', () => {
       expect(comments).toStrictEqual([
         {
           id: 'comment-123',
-          date: 'now',
+          date: 'now1',
           content: 'test comment',
           username: 'dicoding',
           is_delete: false,
         },
         {
           id: 'comment-456',
-          date: 'now',
+          date: 'now2',
           content: 'test comment',
           username: 'dicoding',
           is_delete: true,
