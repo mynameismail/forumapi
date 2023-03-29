@@ -1,3 +1,5 @@
+/* eslint class-methods-use-this: ["error", { "exceptMethods": ["_validatePayload"] }] */
+
 class LogoutUserUseCase {
   constructor({
     authenticationRepository,

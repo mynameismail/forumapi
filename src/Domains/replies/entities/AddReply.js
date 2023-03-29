@@ -1,3 +1,5 @@
+/* eslint class-methods-use-this: ["error", { "exceptMethods": ["_verifyPayload"] }] */
+
 class AddReply {
   constructor(payload) {
     this._verifyPayload(payload);

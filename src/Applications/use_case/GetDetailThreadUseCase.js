@@ -1,3 +1,5 @@
+/* eslint class-methods-use-this: ["error", { "exceptMethods": ["_associateRepliesToComments"] }] */
+
 const DetailThread = require('../../Domains/threads/entities/DetailThread');
 const DetailComment = require('../../Domains/comments/entities/DetailComment');
 const DetailReply = require('../../Domains/replies/entities/DetailReply');
