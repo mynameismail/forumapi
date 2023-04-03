@@ -66,6 +66,16 @@ describe('GetDetailThreadUseCase', () => {
         is_delete: false,
       },
     ];
+    const mockLikeCounts = [
+      {
+        comment_id: 'comment-123',
+        like_count: '1',
+      },
+      {
+        comment_id: 'comment-456',
+        like_count: '2',
+      },
+    ];
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
@@ -73,6 +83,8 @@ describe('GetDetailThreadUseCase', () => {
       .mockImplementation(() => Promise.resolve(mockDetailThread));
     mockCommentRepository.getCommentsByThreadId = jest.fn()
       .mockImplementation(() => Promise.resolve(mockComments));
+    mockCommentRepository.getLikeCountsByCommentIds = jest.fn()
+      .mockImplementation(() => Promise.resolve(mockLikeCounts));
     mockReplyRepository.getRepliesByCommentIds = jest.fn()
       .mockImplementation(() => Promise.resolve(mockReplies));
     const getDetailThreadUseCase = new GetDetailThreadUseCase({
@@ -98,6 +110,7 @@ describe('GetDetailThreadUseCase', () => {
           date: 'now1',
           content: 'test comment',
           is_delete: false,
+          likeCount: 1,
           replies: [
             new DetailReply({
               id: 'reply-123',
@@ -123,6 +136,7 @@ describe('GetDetailThreadUseCase', () => {
           date: 'now2',
           content: '**komentar telah dihapus**',
           is_delete: true,
+          likeCount: 2,
           replies: [
             new DetailReply({
               id: 'reply-789',
@@ -140,6 +154,7 @@ describe('GetDetailThreadUseCase', () => {
           date: 'now3',
           content: 'test comment',
           is_delete: false,
+          likeCount: 0,
           replies: [],
         }),
       ],
@@ -147,6 +162,8 @@ describe('GetDetailThreadUseCase', () => {
 
     expect(mockThreadRepository.getDetailThreadById).toBeCalledWith(mockThreadId);
     expect(mockCommentRepository.getCommentsByThreadId).toBeCalledWith(mockThreadId);
+    expect(mockCommentRepository.getLikeCountsByCommentIds)
+      .toBeCalledWith(['comment-123', 'comment-456', 'comment-789']);
     expect(mockReplyRepository.getRepliesByCommentIds)
       .toBeCalledWith(['comment-123', 'comment-456', 'comment-789']);
   });
