@@ -9,6 +9,7 @@ class LikeCommentUseCase {
   async execute(useCasePayload) {
     const likeComment = new LikeComment(useCasePayload);
     await this._threadRepository.checkIfThreadIdExist(likeComment.threadId);
+    await this._commentRepository.checkIfCommentIdExist(likeComment.commentId);
     const liked = await this._commentRepository
       .checkIfCommentLiked(likeComment.commentId, likeComment.userId);
     if (liked) {
