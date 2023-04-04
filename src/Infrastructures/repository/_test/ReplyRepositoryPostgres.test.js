@@ -12,24 +12,28 @@ const pool = require('../../database/postgres/pool');
 describe('ReplyRepositoryPostgres', () => {
   afterEach(async () => {
     await RepliesTableTestHelper.cleanTable();
-    await CommentsTableTestHelper.cleanTable();
-    await ThreadsTableTestHelper.cleanTable();
-    await UsersTableTestHelper.cleanTable();
   });
 
   afterAll(async () => {
+    await CommentsTableTestHelper.cleanTable();
+    await ThreadsTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable();
     await pool.end();
+  });
+
+  const mockUserId = 'user-123';
+  const mockThreadId = 'thread-123';
+  const mockCommentId = 'comment-123';
+
+  beforeAll(async () => {
+    await UsersTableTestHelper.addUser({ id: mockUserId });
+    await ThreadsTableTestHelper.addThread({ id: mockThreadId });
+    await CommentsTableTestHelper.addComment({ id: mockCommentId });
   });
 
   describe('addReply function', () => {
     it('should persist add reply and return added reply correctly', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockCommentId = 'comment-123';
-      const mockThreadId = 'thread-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
-      await CommentsTableTestHelper.addComment({ id: mockCommentId });
       const reply = new AddReply({
         content: 'test reply',
         commentId: mockCommentId,
@@ -64,13 +68,7 @@ describe('ReplyRepositoryPostgres', () => {
 
     it('should throw AuthorizationError when user is not owner', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      const mockCommentId = 'comment-123';
       const mockReplyId = 'reply-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
-      await CommentsTableTestHelper.addComment({ id: mockCommentId });
       await RepliesTableTestHelper.addReply({
         id: mockReplyId,
         commentId: mockCommentId,
@@ -85,13 +83,7 @@ describe('ReplyRepositoryPostgres', () => {
 
     it('should not throw NotFoundError nor AuthorizationError when reply found and user is owner', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      const mockCommentId = 'comment-123';
       const mockReplyId = 'reply-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
-      await CommentsTableTestHelper.addComment({ id: mockCommentId });
       await RepliesTableTestHelper.addReply({
         id: mockReplyId,
         commentId: mockCommentId,
@@ -110,13 +102,7 @@ describe('ReplyRepositoryPostgres', () => {
   describe('deleteReply function', () => {
     it('should soft-delete reply from database', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      const mockCommentId = 'comment-123';
       const mockReplyId = 'reply-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
-      await CommentsTableTestHelper.addComment({ id: mockCommentId });
       await RepliesTableTestHelper.addReply({
         id: mockReplyId,
         commentId: mockCommentId,
@@ -136,13 +122,8 @@ describe('ReplyRepositoryPostgres', () => {
   describe('getRepliesByCommentIds function', () => {
     it('should return replies by commentIds', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
       const mockCommentIds = ['comment-123', 'comment-456'];
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
-      await CommentsTableTestHelper.addComment({ id: mockCommentIds[0] });
-      await CommentsTableTestHelper.addComment({ id: mockCommentIds[1] });
+      await CommentsTableTestHelper.addComment({ id: 'comment-456' });
       await RepliesTableTestHelper.addReply({
         id: 'reply-123',
         date: 'now1',
