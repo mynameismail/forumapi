@@ -12,21 +12,25 @@ describe('CommentRepositoryPostgres', () => {
   afterEach(async () => {
     await CommentsTableTestHelper.cleanTableCommentLike();
     await CommentsTableTestHelper.cleanTable();
-    await ThreadsTableTestHelper.cleanTable();
-    await UsersTableTestHelper.cleanTable();
   });
 
   afterAll(async () => {
+    await ThreadsTableTestHelper.cleanTable();
+    await UsersTableTestHelper.cleanTable();
     await pool.end();
+  });
+
+  const mockUserId = 'user-123';
+  const mockThreadId = 'thread-123';
+
+  beforeAll(async () => {
+    await UsersTableTestHelper.addUser({ id: mockUserId });
+    await ThreadsTableTestHelper.addThread({ id: mockThreadId });
   });
 
   describe('addComment function', () => {
     it('should persist add comment and return added comment correctly', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       const comment = new AddComment({
         content: 'test comment',
         threadId: mockThreadId,
@@ -60,11 +64,7 @@ describe('CommentRepositoryPostgres', () => {
 
     it('should throw AuthorizationError when user is not owner', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
       const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({
         id: mockCommentId,
         threadId: mockThreadId,
@@ -79,11 +79,7 @@ describe('CommentRepositoryPostgres', () => {
 
     it('should not throw NotFoundError nor AuthorizationError when comment found and user is owner', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
       const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({
         id: mockCommentId,
         threadId: mockThreadId,
@@ -102,11 +98,7 @@ describe('CommentRepositoryPostgres', () => {
   describe('deleteComment function', () => {
     it('should soft-delete comment from database', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
       const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({
         id: mockCommentId,
         threadId: mockThreadId,
@@ -126,10 +118,6 @@ describe('CommentRepositoryPostgres', () => {
   describe('getCommentsByThreadId function', () => {
     it('should return comments by threadId', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({
         id: 'comment-123',
         date: 'now1',
@@ -177,8 +165,6 @@ describe('CommentRepositoryPostgres', () => {
 
     it('should not throw NotFoundError when commentId exist', async () => {
       // Arrange
-      await UsersTableTestHelper.addUser({ id: 'user-123' });
-      await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
       await CommentsTableTestHelper.addComment({ id: 'comment-123' });
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
       // Action and Assert
@@ -190,10 +176,7 @@ describe('CommentRepositoryPostgres', () => {
   describe('checkIfCommentLiked function', () => {
     it('should return false when unliked', async () => {
       // Arrange
-      const mockUserId = 'user-123';
       const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
       await CommentsTableTestHelper.addComment({ id: mockCommentId });
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
 
@@ -206,10 +189,7 @@ describe('CommentRepositoryPostgres', () => {
 
     it('should return true when liked', async () => {
       // Arrange
-      const mockUserId = 'user-123';
       const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: 'thread-123' });
       await CommentsTableTestHelper.addComment({ id: mockCommentId });
       await CommentsTableTestHelper.likeComment({
         commentId: mockCommentId,
@@ -228,11 +208,7 @@ describe('CommentRepositoryPostgres', () => {
   describe('addCommentLike function', () => {
     it('should persist add comment like', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
       const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({ id: mockCommentId });
       const fakeIdGenerator = () => '123';
       const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, fakeIdGenerator);
@@ -249,11 +225,7 @@ describe('CommentRepositoryPostgres', () => {
   describe('deleteCommentLike function', () => {
     it('should delete comment like', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
       const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({ id: mockCommentId });
       await CommentsTableTestHelper.likeComment({
         commentId: mockCommentId,
@@ -273,11 +245,8 @@ describe('CommentRepositoryPostgres', () => {
   describe('getLikeCountsByCommentIds function', () => {
     it('should return like counts by commentIds', async () => {
       // Arrange
-      const mockThreadId = 'thread-123';
       const mockCommentIds = ['comment-123', 'comment-456'];
-      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'dicoding1' });
       await UsersTableTestHelper.addUser({ id: 'user-456', username: 'dicoding2' });
-      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({ id: mockCommentIds[0] });
       await CommentsTableTestHelper.addComment({ id: mockCommentIds[1] });
       await CommentsTableTestHelper.likeComment({
