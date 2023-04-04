@@ -9,6 +9,7 @@ describe('a DetailComment entities', () => {
       date: 'abc',
       content: 'abc',
       is_delete: 'abc',
+      likeCount: 'abc',
     };
     // Action and Assert
     expect(() => new DetailComment(payload)).toThrowError('DETAIL_COMMENT.NOT_CONTAIN_NEEDED_PROPERTY');
@@ -22,6 +23,7 @@ describe('a DetailComment entities', () => {
       date: 'abc',
       content: [],
       is_delete: 'abc',
+      likeCount: false,
       replies: 123,
     };
     // Action and Assert
@@ -36,6 +38,7 @@ describe('a DetailComment entities', () => {
       date: 'abc',
       content: 'abc',
       is_delete: false,
+      likeCount: 0,
       replies: [],
     };
     // Action
@@ -44,6 +47,7 @@ describe('a DetailComment entities', () => {
       username,
       date,
       content,
+      likeCount,
       replies,
     } = new DetailComment(payload);
     // Assert
@@ -51,6 +55,7 @@ describe('a DetailComment entities', () => {
     expect(username).toEqual(payload.username);
     expect(date).toEqual(payload.date);
     expect(content).toEqual(payload.content);
+    expect(likeCount).toEqual(payload.likeCount);
     expect(replies).toEqual(payload.replies);
   });
 
@@ -62,6 +67,7 @@ describe('a DetailComment entities', () => {
       date: 'abc',
       content: 'abc',
       is_delete: true,
+      likeCount: 0,
       replies: [],
     };
     // Action
@@ -70,6 +76,7 @@ describe('a DetailComment entities', () => {
       username,
       date,
       content,
+      likeCount,
       replies,
     } = new DetailComment(payload);
     // Assert
@@ -77,6 +84,7 @@ describe('a DetailComment entities', () => {
     expect(username).toEqual(payload.username);
     expect(date).toEqual(payload.date);
     expect(content).toEqual('**komentar telah dihapus**');
+    expect(likeCount).toEqual(payload.likeCount);
     expect(replies).toEqual(payload.replies);
   });
 });

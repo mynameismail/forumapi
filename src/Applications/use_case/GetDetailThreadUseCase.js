@@ -1,4 +1,6 @@
-/* eslint class-methods-use-this: ["error", { "exceptMethods": ["_associateRepliesToComments"] }] */
+/* eslint class-methods-use-this: ["error", {
+  "exceptMethods": ["_associateLikesAndRepliesToComments"],
+}] */
 
 const DetailThread = require('../../Domains/threads/entities/DetailThread');
 const DetailComment = require('../../Domains/comments/entities/DetailComment');
@@ -15,26 +17,29 @@ class GetDetailThreadUseCase {
     const thread = await this._threadRepository.getDetailThreadById(threadId);
     const comments = await this._commentRepository.getCommentsByThreadId(threadId);
     const commentIds = comments.map((comment) => comment.id);
+    const likeCounts = await this._commentRepository.getLikeCountsByCommentIds(commentIds);
     const replies = await this._replyRepository.getRepliesByCommentIds(commentIds);
-    const commentsWithReplies = this._associateRepliesToComments(comments, replies);
+    const detailComments = this._associateLikesAndRepliesToComments(comments, likeCounts, replies);
     return new DetailThread({
       ...thread,
-      comments: commentsWithReplies,
+      comments: detailComments,
     });
   }
 
-  _associateRepliesToComments(comments, replies) {
-    const mapReplies = {};
-    replies.forEach((reply) => {
-      if (!(reply.comment_id in mapReplies)) {
-        mapReplies[reply.comment_id] = [];
-      }
-      mapReplies[reply.comment_id].push(new DetailReply(reply));
+  _associateLikesAndRepliesToComments(comments, likeCounts, replies) {
+    return comments.map((comment) => {
+      const findLike = likeCounts.find((like) => like.comment_id === comment.id);
+      const likeCount = findLike !== undefined ? Number(findLike.like_count) : 0;
+
+      const commentReplies = replies.filter((reply) => reply.comment_id === comment.id)
+        .map((reply) => new DetailReply(reply));
+
+      return new DetailComment({
+        ...comment,
+        likeCount,
+        replies: commentReplies,
+      });
     });
-    return comments.map((comment) => new DetailComment({
-      ...comment,
-      replies: mapReplies[comment.id] || [],
-    }));
   }
 }
 

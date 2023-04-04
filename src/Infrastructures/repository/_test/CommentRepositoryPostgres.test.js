@@ -269,4 +269,48 @@ describe('CommentRepositoryPostgres', () => {
       expect(likes).toHaveLength(0);
     });
   });
+
+  describe('getLikeCountsByCommentIds function', () => {
+    it('should return like counts by commentIds', async () => {
+      // Arrange
+      const mockThreadId = 'thread-123';
+      const mockCommentIds = ['comment-123', 'comment-456'];
+      await UsersTableTestHelper.addUser({ id: 'user-123', username: 'dicoding1' });
+      await UsersTableTestHelper.addUser({ id: 'user-456', username: 'dicoding2' });
+      await ThreadsTableTestHelper.addThread({ id: mockThreadId });
+      await CommentsTableTestHelper.addComment({ id: mockCommentIds[0] });
+      await CommentsTableTestHelper.addComment({ id: mockCommentIds[1] });
+      await CommentsTableTestHelper.likeComment({
+        id: 'comment-like-123',
+        commentId: mockCommentIds[0],
+        userId: 'user-123',
+      });
+      await CommentsTableTestHelper.likeComment({
+        id: 'comment-like-456',
+        commentId: mockCommentIds[0],
+        userId: 'user-456',
+      });
+      await CommentsTableTestHelper.likeComment({
+        id: 'comment-like-789',
+        commentId: mockCommentIds[1],
+        userId: 'user-456',
+      });
+      const commentRepositoryPostgres = new CommentRepositoryPostgres(pool, {});
+
+      // Action
+      const likeCounts = await commentRepositoryPostgres.getLikeCountsByCommentIds(mockCommentIds);
+
+      // Assert
+      expect(likeCounts).toStrictEqual([
+        {
+          comment_id: 'comment-123',
+          like_count: '2',
+        },
+        {
+          comment_id: 'comment-456',
+          like_count: '1',
+        },
+      ]);
+    });
+  });
 });
