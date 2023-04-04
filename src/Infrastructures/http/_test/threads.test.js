@@ -9,20 +9,27 @@ const pool = require('../../database/postgres/pool');
 
 describe('threads endpoint', () => {
   afterAll(async () => {
+    await UsersTableTestHelper.cleanTable();
     await pool.end();
   });
 
   afterEach(async () => {
     await ThreadsTableTestHelper.cleanTable();
-    await UsersTableTestHelper.cleanTable();
+  });
+
+  const mockUserId = 'user-123';
+  const jwtTokenManager = new JwtTokenManager(Jwt.token);
+
+  beforeAll(async () => {
+    await UsersTableTestHelper.addUser({ id: mockUserId });
   });
 
   describe('when POST /threads', () => {
+    const requestMethod = 'POST';
+    const requestUrl = '/threads';
+
     it('should response 201 and persisted thread', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-
       const requestPayload = {
         title: 'test thread',
         body: 'test thread body',
@@ -30,11 +37,10 @@ describe('threads endpoint', () => {
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'POST',
-        url: '/threads',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -50,20 +56,16 @@ describe('threads endpoint', () => {
 
     it('should response 400 when request payload not contain needed property', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      UsersTableTestHelper.addUser({ id: mockUserId });
-
       const requestPayload = {
         title: 'test thread',
       };
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'POST',
-        url: '/threads',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -79,9 +81,6 @@ describe('threads endpoint', () => {
 
     it('should response 400 when request payload not meet data type specification', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      UsersTableTestHelper.addUser({ id: mockUserId });
-
       const requestPayload = {
         title: 'test thread',
         body: true,
@@ -89,11 +88,10 @@ describe('threads endpoint', () => {
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'POST',
-        url: '/threads',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -117,8 +115,8 @@ describe('threads endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/threads',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -128,11 +126,12 @@ describe('threads endpoint', () => {
   });
 
   describe('when GET /threads/{threadId}', () => {
+    const mockThreadId = 'thread-123';
+    const requestMethod = 'GET';
+    const requestUrl = `/threads/${mockThreadId}`;
+
     it('should response 200 and return detail thread', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
       await CommentsTableTestHelper.addComment({ id: 'comment-123', threadId: mockThreadId });
       await CommentsTableTestHelper.addComment({ id: 'comment-456', threadId: mockThreadId });
@@ -140,8 +139,8 @@ describe('threads endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'GET',
-        url: `/threads/${mockThreadId}`,
+        method: requestMethod,
+        url: requestUrl,
       });
 
       // Assert
@@ -154,13 +153,12 @@ describe('threads endpoint', () => {
 
     it('should response 404 when threadId not exist', async () => {
       // Arrange
-      const mockThreadId = 'thread-123';
       const server = await createServer(container);
 
       // Action
       const response = await server.inject({
-        method: 'GET',
-        url: `/threads/${mockThreadId}`,
+        method: requestMethod,
+        url: requestUrl,
       });
 
       // Assert
