@@ -13,14 +13,10 @@ describe('LikeCommentUseCase', () => {
 
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
-    mockThreadRepository.checkIfThreadIdExist = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.checkIfCommentIdExist = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.checkIfCommentLiked = jest.fn()
-      .mockImplementation(() => Promise.resolve(false));
-    mockCommentRepository.addCommentLike = jest.fn()
-      .mockImplementation(() => Promise.resolve());
+    mockThreadRepository.checkIfThreadIdExist = jest.fn(() => Promise.resolve());
+    mockCommentRepository.checkIfCommentIdExist = jest.fn(() => Promise.resolve());
+    mockCommentRepository.checkIfCommentLiked = jest.fn(() => Promise.resolve(false));
+    mockCommentRepository.addCommentLike = jest.fn(() => Promise.resolve());
     const likeCommentUseCase = new LikeCommentUseCase({
       commentRepository: mockCommentRepository,
       threadRepository: mockThreadRepository,
@@ -48,14 +44,10 @@ describe('LikeCommentUseCase', () => {
 
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
-    mockThreadRepository.checkIfThreadIdExist = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.checkIfCommentIdExist = jest.fn()
-      .mockImplementation(() => Promise.resolve());
-    mockCommentRepository.checkIfCommentLiked = jest.fn()
-      .mockImplementation(() => Promise.resolve(true));
-    mockCommentRepository.deleteCommentLike = jest.fn()
-      .mockImplementation(() => Promise.resolve());
+    mockThreadRepository.checkIfThreadIdExist = jest.fn(() => Promise.resolve());
+    mockCommentRepository.checkIfCommentIdExist = jest.fn(() => Promise.resolve());
+    mockCommentRepository.checkIfCommentLiked = jest.fn(() => Promise.resolve(true));
+    mockCommentRepository.deleteCommentLike = jest.fn(() => Promise.resolve());
     const likeCommentUseCase = new LikeCommentUseCase({
       commentRepository: mockCommentRepository,
       threadRepository: mockThreadRepository,

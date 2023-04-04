@@ -79,14 +79,11 @@ describe('GetDetailThreadUseCase', () => {
     const mockThreadRepository = new ThreadRepository();
     const mockCommentRepository = new CommentRepository();
     const mockReplyRepository = new ReplyRepository();
-    mockThreadRepository.getDetailThreadById = jest.fn()
-      .mockImplementation(() => Promise.resolve(mockDetailThread));
-    mockCommentRepository.getCommentsByThreadId = jest.fn()
-      .mockImplementation(() => Promise.resolve(mockComments));
-    mockCommentRepository.getLikeCountsByCommentIds = jest.fn()
-      .mockImplementation(() => Promise.resolve(mockLikeCounts));
-    mockReplyRepository.getRepliesByCommentIds = jest.fn()
-      .mockImplementation(() => Promise.resolve(mockReplies));
+    mockThreadRepository.getDetailThreadById = jest.fn(() => Promise.resolve(mockDetailThread));
+    mockCommentRepository.getCommentsByThreadId = jest.fn(() => Promise.resolve(mockComments));
+    mockCommentRepository.getLikeCountsByCommentIds = jest
+      .fn(() => Promise.resolve(mockLikeCounts));
+    mockReplyRepository.getRepliesByCommentIds = jest.fn(() => Promise.resolve(mockReplies));
     const getDetailThreadUseCase = new GetDetailThreadUseCase({
       threadRepository: mockThreadRepository,
       commentRepository: mockCommentRepository,
