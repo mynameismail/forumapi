@@ -9,18 +9,22 @@ const pool = require('../../database/postgres/pool');
 describe('ThreadRepositoryPostgres', () => {
   afterEach(async () => {
     await ThreadsTableTestHelper.cleanTable();
-    await UsersTableTestHelper.cleanTable();
   });
 
   afterAll(async () => {
+    await UsersTableTestHelper.cleanTable();
     await pool.end();
+  });
+
+  const mockUserId = 'user-123';
+
+  beforeAll(async () => {
+    await UsersTableTestHelper.addUser({ id: mockUserId });
   });
 
   describe('addThread function', () => {
     it('should persist add thread and return added thread correctly', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
       const thread = new AddThread({
         title: 'test thread',
         body: 'test thread body',
@@ -54,8 +58,6 @@ describe('ThreadRepositoryPostgres', () => {
 
     it('should not throw NotFoundError when threadId exist', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: 'thread-123', owner: mockUserId });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
       // Action and Assert
@@ -75,10 +77,7 @@ describe('ThreadRepositoryPostgres', () => {
 
     it('should return a detailThread correctly', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockUsername = 'developer';
       const mockThreadId = 'thread-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId, username: mockUsername });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId, owner: mockUserId });
       const threadRepositoryPostgres = new ThreadRepositoryPostgres(pool, {});
 
@@ -91,7 +90,7 @@ describe('ThreadRepositoryPostgres', () => {
         title: 'test thread',
         body: 'test thread body',
         date: 'now',
-        username: 'developer',
+        username: 'dicoding',
       });
     });
   });

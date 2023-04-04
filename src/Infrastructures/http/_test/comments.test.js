@@ -9,21 +9,29 @@ const pool = require('../../database/postgres/pool');
 
 describe('comments endpoint', () => {
   afterAll(async () => {
+    await UsersTableTestHelper.cleanTable();
     await pool.end();
   });
 
   afterEach(async () => {
     await ThreadsTableTestHelper.cleanTable();
     await CommentsTableTestHelper.cleanTable();
-    await UsersTableTestHelper.cleanTable();
+  });
+
+  const mockUserId = 'user-123';
+  const mockThreadId = 'thread-123';
+  const jwtTokenManager = new JwtTokenManager(Jwt.token);
+
+  beforeAll(async () => {
+    await UsersTableTestHelper.addUser({ id: mockUserId });
   });
 
   describe('when POST /threads/{threadId}/comments', () => {
+    const requestMethod = 'POST';
+    const requestUrl = `/threads/${mockThreadId}/comments`;
+
     it('should response 201 and persisted comment', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
 
       const requestPayload = {
@@ -32,11 +40,10 @@ describe('comments endpoint', () => {
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'POST',
-        url: `/threads/${mockThreadId}/comments`,
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -52,20 +59,16 @@ describe('comments endpoint', () => {
 
     it('should response 400 when request payload not contain needed property', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
 
       const requestPayload = {};
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'POST',
-        url: `/threads/${mockThreadId}/comments`,
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -81,9 +84,6 @@ describe('comments endpoint', () => {
 
     it('should response 400 when request payload not meet data type specification', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
 
       const requestPayload = {
@@ -92,11 +92,10 @@ describe('comments endpoint', () => {
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'POST',
-        url: `/threads/${mockThreadId}/comments`,
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -112,21 +111,16 @@ describe('comments endpoint', () => {
 
     it('should response 404 when threadId not exist', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-
       const requestPayload = {
         content: 'test comment',
       };
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'POST',
-        url: `/threads/${mockThreadId}/comments`,
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -142,12 +136,12 @@ describe('comments endpoint', () => {
   });
 
   describe('when DELETE /threads/{threadId}/comments/{commentId}', () => {
+    const mockCommentId = 'comment-123';
+    const requestMethod = 'DELETE';
+    const requestUrl = `/threads/${mockThreadId}/comments/${mockCommentId}`;
+
     it('should response 200', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({
         id: mockCommentId,
@@ -158,11 +152,10 @@ describe('comments endpoint', () => {
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'DELETE',
-        url: `/threads/${mockThreadId}/comments/${mockCommentId}`,
+        method: requestMethod,
+        url: requestUrl,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -176,14 +169,12 @@ describe('comments endpoint', () => {
 
     it('should response 401 when authorization is not provided', async () => {
       // Arrange
-      const mockThreadId = 'thread-123';
-      const mockCommentId = 'comment-123';
       const server = await createServer(container);
 
       // Action
       const response = await server.inject({
-        method: 'DELETE',
-        url: `/threads/${mockThreadId}/comments/${mockCommentId}`,
+        method: requestMethod,
+        url: requestUrl,
       });
 
       // Assert
@@ -192,18 +183,13 @@ describe('comments endpoint', () => {
 
     it('should response 404 when threadId not exist', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'DELETE',
-        url: `/threads/thread-456/comments/${mockCommentId}`,
+        method: requestMethod,
+        url: requestUrl,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -218,20 +204,15 @@ describe('comments endpoint', () => {
 
     it('should response 404 when commentId not exist', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
 
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'DELETE',
-        url: `/threads/${mockThreadId}/comments/${mockCommentId}`,
+        method: requestMethod,
+        url: requestUrl,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -246,12 +227,12 @@ describe('comments endpoint', () => {
   });
 
   describe('when PUT /threads/{threadId}/comments/{commentId}/likes', () => {
+    const mockCommentId = 'comment-123';
+    const requestMethod = 'PUT';
+    const requestUrl = `/threads/${mockThreadId}/comments/${mockCommentId}/likes`;
+
     it('should response 200', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
       await CommentsTableTestHelper.addComment({
         id: mockCommentId,
@@ -262,11 +243,10 @@ describe('comments endpoint', () => {
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'PUT',
-        url: `/threads/${mockThreadId}/comments/${mockCommentId}/likes`,
+        method: requestMethod,
+        url: requestUrl,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -280,14 +260,12 @@ describe('comments endpoint', () => {
 
     it('should response 401 when authorization is not provided', async () => {
       // Arrange
-      const mockThreadId = 'thread-123';
-      const mockCommentId = 'comment-123';
       const server = await createServer(container);
 
       // Action
       const response = await server.inject({
-        method: 'PUT',
-        url: `/threads/${mockThreadId}/comments/${mockCommentId}/likes`,
+        method: requestMethod,
+        url: requestUrl,
       });
 
       // Assert
@@ -296,18 +274,13 @@ describe('comments endpoint', () => {
 
     it('should response 404 when threadId not exist', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
-
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'PUT',
-        url: `/threads/thread-456/comments/${mockCommentId}/likes`,
+        method: requestMethod,
+        url: requestUrl,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -322,20 +295,15 @@ describe('comments endpoint', () => {
 
     it('should response 404 when commentId not exist', async () => {
       // Arrange
-      const mockUserId = 'user-123';
-      const mockThreadId = 'thread-123';
-      const mockCommentId = 'comment-123';
-      await UsersTableTestHelper.addUser({ id: mockUserId });
       await ThreadsTableTestHelper.addThread({ id: mockThreadId });
 
       const server = await createServer(container);
 
       // Action
-      const jwtTokenManager = new JwtTokenManager(Jwt.token);
       const accessToken = await jwtTokenManager.createAccessToken({ id: mockUserId });
       const response = await server.inject({
-        method: 'PUT',
-        url: `/threads/${mockThreadId}/comments/${mockCommentId}/likes`,
+        method: requestMethod,
+        url: requestUrl,
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

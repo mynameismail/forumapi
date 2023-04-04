@@ -13,6 +13,9 @@ describe('/users endpoint', () => {
   });
 
   describe('when POST /users', () => {
+    const requestMethod = 'POST';
+    const requestUrl = '/users';
+
     it('should response 201 and persisted user', async () => {
       // Arrange
       const requestPayload = {
@@ -25,8 +28,8 @@ describe('/users endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/users',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -47,8 +50,8 @@ describe('/users endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/users',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -70,8 +73,8 @@ describe('/users endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/users',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -93,8 +96,8 @@ describe('/users endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/users',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -116,8 +119,8 @@ describe('/users endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/users',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -140,8 +143,8 @@ describe('/users endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/users',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 

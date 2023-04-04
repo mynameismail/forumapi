@@ -16,6 +16,9 @@ describe('/authentications endpoint', () => {
   });
 
   describe('when POST /authentications', () => {
+    const requestMethod = 'POST';
+    const requestUrl = '/authentications';
+
     it('should response 201 and new authentication', async () => {
       // Arrange
       const requestPayload = {
@@ -36,8 +39,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -59,8 +62,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -91,8 +94,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -112,8 +115,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -134,8 +137,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'POST',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: requestPayload,
       });
 
@@ -148,6 +151,9 @@ describe('/authentications endpoint', () => {
   });
 
   describe('when PUT /authentications', () => {
+    const requestMethod = 'PUT';
+    const requestUrl = '/authentications';
+
     it('should return 200 and new access token', async () => {
       // Arrange
       const server = await createServer(container);
@@ -174,8 +180,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'PUT',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: {
           refreshToken,
         },
@@ -193,8 +199,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'PUT',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: {},
       });
 
@@ -210,8 +216,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'PUT',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: {
           refreshToken: 123,
         },
@@ -229,8 +235,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'PUT',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: {
           refreshToken: 'invalid_refresh_token',
         },
@@ -250,8 +256,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'PUT',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: {
           refreshToken,
         },
@@ -266,6 +272,9 @@ describe('/authentications endpoint', () => {
   });
 
   describe('when DELETE /authentications', () => {
+    const requestMethod = 'DELETE';
+    const requestUrl = '/authentications';
+
     it('should response 200 if refresh token valid', async () => {
       // Arrange
       const server = await createServer(container);
@@ -274,8 +283,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'DELETE',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: {
           refreshToken,
         },
@@ -294,8 +303,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'DELETE',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: {
           refreshToken,
         },
@@ -314,8 +323,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'DELETE',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: {},
       });
 
@@ -331,8 +340,8 @@ describe('/authentications endpoint', () => {
 
       // Action
       const response = await server.inject({
-        method: 'DELETE',
-        url: '/authentications',
+        method: requestMethod,
+        url: requestUrl,
         payload: {
           refreshToken: 123,
         },
