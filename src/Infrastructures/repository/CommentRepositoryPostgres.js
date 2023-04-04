@@ -122,7 +122,8 @@ class CommentRepositoryPostgres extends CommentRepository {
       text: `SELECT comment_id, COUNT(id) AS like_count
         FROM comment_likes
         WHERE comment_id = ANY($1)
-        GROUP BY comment_id`,
+        GROUP BY comment_id
+        ORDER BY comment_id`,
       values: [commentIds],
     };
 
